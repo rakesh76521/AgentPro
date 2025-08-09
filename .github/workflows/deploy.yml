@@ -21,7 +21,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Configure git user
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
       - name: Build the app
+        env:
+          CI: false
         run: npm run build
 
       - name: Deploy to GitHub Pages
@@ -29,3 +36,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
+          # Uncomment and set if deploying from a subfolder
+          # cname: your-custom-domain.com
