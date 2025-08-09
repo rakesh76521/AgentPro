@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 const Calculate = () => {
   const loggeduser = useSelector((state) => state.loggeduser.user);
   const dispatch = useDispatch();
-  const { Orgcode } = useParams();
+  const { Orgcode } = 'Org01';
 
   const customernameRef = useRef();
   const commitionRef = useRef();

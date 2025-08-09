@@ -3,7 +3,7 @@ import { useNavigate,useParams } from 'react-router-dom';
 
 const Forbidden = () => {
   const navigate = useNavigate();
-  const { Orgcode } = useParams();
+  const { Orgcode } = 'Org01';
   
 
   return (

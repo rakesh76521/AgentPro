@@ -10,7 +10,7 @@ import { utils, writeFile, write } from "xlsx-js-style";
 const ViewReport = () => {
     const loggeduser = useSelector((state) => state.loggeduser.user);
     const dispatch = useDispatch();
-    const { Orgcode } = useParams();
+    const { Orgcode } = 'Org01';
     const [searchInput, setSearchInput] = useState('');
     const [ipoid, setipoid] = useState('');
     const [filteredipos, setFilteredipos] = useState(['UG50', 'VG', 'RSA', 'RITESH', 'SHARES', 'VT', 'GB', 'AYT', 'DB']);

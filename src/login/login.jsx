@@ -5,7 +5,8 @@ import { setLoggedUser } from "../../store/slices/loggeduser";
 import { Helmet } from "react-helmet";
 
 const Login = () => {
-    const { Orgcode } = useParams();
+    // const { Orgcode } = useParams();
+    const { Orgcode } = 'Org01';
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();

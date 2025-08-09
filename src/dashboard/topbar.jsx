@@ -13,7 +13,7 @@ const Topbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const toggleDropdown = () => setIsOpen(prev => !prev);
     const dropdownRef = useRef(null);
-    const { Orgcode } = useParams();
+    const { Orgcode } = 'Org01';
 
     // Close dropdown if click happens outside
     useEffect(() => {
