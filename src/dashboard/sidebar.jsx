@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const location = useLocation();
-  const { Orgcode } = 'Org01';
+  const Orgcode  = 'Org01';
   const lastSegment = location.pathname.split('/').filter(Boolean).pop();
   const segments = location.pathname.split('/').filter(Boolean);
   const secondLastSegment = segments[segments.length - 2];

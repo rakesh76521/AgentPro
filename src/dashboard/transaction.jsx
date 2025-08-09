@@ -9,7 +9,7 @@ const Transaction = () => {
     const loggeduser = useSelector((state) => state.loggeduser.user);
     const masterrecord = useSelector((state) => state.mastercommonrecord.mastercommonrec);
     const dispatch = useDispatch();
-    const { Orgcode } = 'Org01'
+    const Orgcode  = 'Org01'
     const [editinline, seteditinline] = useState(false);
     const iconRef = useRef(null);
 

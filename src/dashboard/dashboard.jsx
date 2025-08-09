@@ -7,7 +7,7 @@ import { Helmet } from "react-helmet";
 
 
 const Dashboard = () => {
-    const { Orgcode } = 'Org01';
+    const  Orgcode  = 'Org01';
     const user = useSelector((state) => state.loggeduser);
     const loggeduserdata = user ?? {};
     const correctOrg = loggeduserdata?.user?.orgShortCode;
