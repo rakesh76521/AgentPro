@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Toggle Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .filter-container {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            transition: background-color 0.5s ease;
+        }
+
+        .filter-container.highlight-apply {
+            background-color: #d4edda; /* light green */
+        }
+
+        .filter-container.highlight-reset {
+            background-color: #f8d7da; /* light red */
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        input, select, button {
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        .filter-toggle {
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 3px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="filter-toggle" onclick="toggleFilters()">Toggle Filters</button>
+
+    <div class="filter-container" id="filterContainer">
+        <div class="filters">
+            <div class="filter-item">
+                <label for="name">Name</label>
+                <input type="text" id="name">
+            </div>
+            <div class="filter-item">
+                <label for="status">Status</label>
+                <select id="status">
+                    <option value="">Select</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="category">Category</label>
+                <select id="category">
+                    <option value="">Select</option>
+                    <option value="cat1">Category 1</option>
+                    <option value="cat2">Category 2</option>
+                </select>
+            </div>
+        </div>
+        <div class="action-buttons" style="margin-top:10px;">
+            <button onclick="applyFilters()">Apply</button>
+            <button onclick="resetFilters()">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleFilters() {
+            const container = document.getElementById('filterContainer');
+            container.style.display = (container.style.display === 'none' || container.style.display === '') 
+                ? 'block' 
+                : 'none';
+        }
+
+        function applyFilters() {
+            const container = document.getElementById('filterContainer');
+            container.classList.add('highlight-apply');
+            setTimeout(() => container.classList.remove('highlight-apply'), 800);
+        }
+
+        function resetFilters() {
+            document.getElementById('name').value = '';
+            document.getElementById('status').value = '';
+            document.getElementById('category').value = '';
+
+            const container = document.getElementById('filterContainer');
+            container.classList.add('highlight-reset');
+            setTimeout(() => container.classList.remove('highlight-reset'), 800);
+        }
+    </script>
+
+</body>
+</html>
