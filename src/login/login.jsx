@@ -162,7 +162,7 @@ const Login = () => {
         }
 
         // const getallusers = JSON.parse(localStorage.getItem('allusers'));
-
+        console.log(Orgcode,'hiiiiiiiiiiiiiii')
         const matchedUser = logindetails.find(
             (item) =>
                 item?.username?.toLowerCase() === username?.toLowerCase() &&
