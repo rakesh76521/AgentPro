@@ -172,7 +172,7 @@ const ViewReport = () => {
         ];
 
         // Sample or real data - make sure it matches the headers
-        const dataRows = resultsArray.map((item) => ([
+        const dataRows = resultsArray?.map((item) => ([
             item.name,
             item.amount,
             item.netamount,
@@ -273,7 +273,7 @@ const ViewReport = () => {
 
         const agents = loggeduser?.username;
 
-        const reportmaster = alldata?.filter((items => items.agentName === agents)).map((item) => {
+        const reportmaster = alldata?.filter((items => items.agentName === agents))?.map((item) => {
             allnames?.push(item.customerName)
             return {
                 name: item.customerName,
@@ -292,7 +292,7 @@ const ViewReport = () => {
         );
 
 
-        const reporttransaction = mainalldata.map(item => ({
+        const reporttransaction = mainalldata?.map(item => ({
             [item.customerName]: {
                 amount: item.amount,
                 gross: item.gross,
@@ -409,8 +409,8 @@ const ViewReport = () => {
 
                             {resultsArray && resultsArray.length > 0 ? (
                                 resultsArray
-                                    .slice(startindex, startindex + Number(records_per_Page))
-                                    .map((element, index) => {
+                                    ?.slice(startindex, startindex + Number(records_per_Page))
+                                    ?.map((element, index) => {
                                         return (
                                             <tr
                                                 key={index}
