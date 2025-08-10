@@ -136,7 +136,7 @@ const ViewReport = () => {
         const searchvalue = e.target.value;
         setsearchvalue(searchvalue);
         if (searchvalue) {
-            const filteredUsers = searchresultsArray.filter(data =>
+            const filteredUsers = searchresultsArray?.filter(data =>
             (
                 data.name.toLowerCase().includes(searchvalue.toLowerCase())
                 // data.agentName.toLowerCase().includes(searchvalue.toLowerCase())
@@ -259,7 +259,7 @@ const ViewReport = () => {
             setipoid('');
             return;
         }
-        const filtered = filteredipos.filter(c =>
+        const filtered = filteredipos?.filter(c =>
             c?.toLowerCase().includes(searchInput?.toLowerCase())
         );
         setFilteredipos(filtered);
@@ -273,7 +273,7 @@ const ViewReport = () => {
 
         const agents = loggeduser?.username;
 
-        const reportmaster = alldata.filter((items => items.agentName === agents)).map((item) => {
+        const reportmaster = alldata?.filter((items => items.agentName === agents)).map((item) => {
             allnames?.push(item.customerName)
             return {
                 name: item.customerName,
@@ -286,7 +286,7 @@ const ViewReport = () => {
         }
         );
 
-        const mainalldata = alldatatrans.filter(itemtran =>
+        const mainalldata = alldatatrans?.filter(itemtran =>
             reportmaster.some(item =>
                 itemtran.customerName?.toLowerCase() === item.name.toLowerCase()
             )
