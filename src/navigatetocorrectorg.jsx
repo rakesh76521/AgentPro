@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 const NavigateToCorrectOrg = () => {
   const rawUser = localStorage.getItem('demologged-user');
   let orgCode = 'Org01'; // fallback if nothing found
-  console.log('hellllllllllllllllllllllllllllllllllllllllllllllllllllllll')
+  //console.log('hellllllllllllllllllllllllllllllllllllllllllllllllllllllll')
   try {
     const user = JSON.parse(rawUser);
     if (user?.orgShortCode) {
