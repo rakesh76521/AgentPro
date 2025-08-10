@@ -3,7 +3,8 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import { Provider, useSelector } from 'react-redux';
 import Store from '../store/store.js';
-import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
+// import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 
 import Login from './login/login.jsx';
 import Dashboard from './dashboard/dashboard.jsx';
@@ -110,8 +111,8 @@ const AppRouter = () => {
 
 root.render(
   <Provider store={Store}>
-    <BrowserRouter>
+    <HashRouter>
       <AppRouter />
-    </BrowserRouter>
+    </HashRouter>
   </Provider>
 );
