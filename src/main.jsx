@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import { Provider, useSelector } from 'react-redux';
 import Store from '../store/store.js';
-import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 
 import Login from './login/login.jsx';
 import Dashboard from './dashboard/dashboard.jsx';
@@ -13,11 +13,8 @@ import NavigateToCorrectOrg from './navigatetocorrectorg.jsx';
 import Calculate from './dashboard/calculate.jsx';
 import Transaction from './dashboard/transaction.jsx';
 import ViewReport from './dashboard/viewreport.jsx';
-import { HashRouter } from 'react-router-dom';
+
 const root = createRoot(document.getElementById('root'));
-<HashRouter>
-  <AppRouter />
-</HashRouter>
 
 // Admin only route wrapper
 const AdminRoute = ({ children }) => {
@@ -48,7 +45,7 @@ const DashboardIndexRedirect = () => {
 
   if (!user) {
     // If no user, redirect to login or root
-    return <Navigate to={`/AgentPro/}`} replace />;
+    return <Navigate to={`/AgentPro/`} replace />;
   }
 
   if (user.role === 'admin') {
@@ -112,10 +109,11 @@ const AppRouter = () => {
   );
 };
 
+// Render with HashRouter so refresh works on GitHub Pages
 root.render(
   <Provider store={Store}>
-    <BrowserRouter>
+    <HashRouter>
       <AppRouter />
-    </BrowserRouter>
+    </HashRouter>
   </Provider>
 );
