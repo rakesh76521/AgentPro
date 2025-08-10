@@ -13,8 +13,12 @@ import NavigateToCorrectOrg from './navigatetocorrectorg.jsx';
 import Calculate from './dashboard/calculate.jsx';
 import Transaction from './dashboard/transaction.jsx';
 import ViewReport from './dashboard/viewreport.jsx';
-
+import { HashRouter } from 'react-router-dom';
 const root = createRoot(document.getElementById('root'));
+<HashRouter>
+  <AppRouter />
+</HashRouter>
+
 // Admin only route wrapper
 const AdminRoute = ({ children }) => {
   const user = useSelector((state) => state.loggeduser.user);
