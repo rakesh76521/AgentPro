@@ -285,7 +285,6 @@ const ViewReport = () => {
             };
         }
         );
-
         const mainalldata = alldatatrans?.filter(itemtran =>
             reportmaster.some(item =>
                 itemtran.customerName?.toLowerCase() === item.name.toLowerCase()
