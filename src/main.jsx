@@ -15,14 +15,13 @@ import Transaction from './dashboard/transaction.jsx';
 import ViewReport from './dashboard/viewreport.jsx';
 
 const root = createRoot(document.getElementById('root'));
-
 // Admin only route wrapper
 const AdminRoute = ({ children }) => {
   const user = useSelector((state) => state.loggeduser.user);
   const { Orgcode } = useParams();
 
   if (user?.role !== 'admin') {
-    return <Navigate to={`/dashboard/${Orgcode}/forbidden`} replace />;
+    return <Navigate to={`/AgentPro/dashboard/forbidden`} replace />;
   }
   return children;
 };
@@ -33,7 +32,7 @@ const ClientRoute = ({ children }) => {
   const { Orgcode } = useParams();
 
   if (user?.role !== 'client') {
-    return <Navigate to={`/dashboard/${Orgcode}/forbidden`} replace />;
+    return <Navigate to={`/AgentPro/dashboard/forbidden`} replace />;
   }
   return children;
 };
@@ -45,15 +44,15 @@ const DashboardIndexRedirect = () => {
 
   if (!user) {
     // If no user, redirect to login or root
-    return <Navigate to={`/${Orgcode}`} replace />;
+    return <Navigate to={`/AgentPro/}`} replace />;
   }
 
   if (user.role === 'admin') {
-    return <Navigate to={`/dashboard/${Orgcode}/calculate`} replace />;
+    return <Navigate to={`/AgentPro/dashboard/calculate`} replace />;
   } else if (user.role === 'client') {
-    return <Navigate to={`/dashboard/${Orgcode}/view-report`} replace />;
+    return <Navigate to={`/AgentPro/dashboard/view-report`} replace />;
   } else {
-    return <Navigate to={`/dashboard/${Orgcode}/forbidden`} replace />;
+    return <Navigate to={`/AgentPro/dashboard/forbidden`} replace />;
   }
 };
 
@@ -62,10 +61,10 @@ const AppRouter = () => {
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<NavigateToCorrectOrg />} />
-      <Route path="/:Orgcode" element={<Login />} />
+      <Route path="/AgentPro/" element={<Login />} />
 
       {/* Protected dashboard routes */}
-      <Route path="/dashboard/:Orgcode" element={<ProtectRoute />}>
+      <Route path="/AgentPro/dashboard/" element={<ProtectRoute />}>
         <Route element={<Dashboard />}>
           {/* Index route: redirect based on role */}
           <Route index element={<DashboardIndexRedirect />} />
@@ -104,7 +103,7 @@ const AppRouter = () => {
       </Route>
 
       {/* Catch all redirect */}
-      <Route path="*" element={<Navigate to="/" />} />
+      <Route path="*" element={<Navigate to="/AgentPro/" />} />
     </Routes>
   );
 };

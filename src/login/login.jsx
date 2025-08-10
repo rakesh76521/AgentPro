@@ -97,11 +97,7 @@ const Login = () => {
 
     // ✅ Get logged-in user from Redux
     const user = useSelector((state) => state.loggeduser?.user);
-    useEffect(() => {
-        if (user?.orgShortCode) {
-            navigate(`/dashboard/${Orgcode}`, { replace: true });
-        }
-    }, [user, Orgcode, navigate]);
+  
 
 
     useEffect(() => {
@@ -162,7 +158,7 @@ const Login = () => {
         }
 
         // const getallusers = JSON.parse(localStorage.getItem('allusers'));
-        console.log(Orgcode,'hiiiiiiiiiiiiiii')
+        
         const matchedUser = logindetails.find(
             (item) =>
                 item?.username?.toLowerCase() === username?.toLowerCase() &&
@@ -176,7 +172,7 @@ const Login = () => {
             // ✅ Defer side effects to avoid React concurrent render error
             setTimeout(() => {
                 dispatch(setLoggedUser(matchedUser));
-                navigate(`/dashboard/${Orgcode}`);
+                navigate(`/AgentPro/dashboard`);
             }, 0);
 
         } else {
@@ -189,10 +185,10 @@ const Login = () => {
         <div className="grid grid-cols-1 min-h-screen">
             <Helmet>
                 <title>Agent Pro</title>
-                <link rel="icon" type="image/jpeg" href="/images/logo.jpeg" />
+                <link rel="icon" type="image/jpeg" href="/AgentPro/images/logo.jpeg" />
             </Helmet>
             <div className="flex flex-col items-center justify-center p-6 lg:p-12">
-                <img className="pl-6 pt-6 w-[140px]" src="/images/logo.jpeg" alt="Logo" />
+                <img className="pl-6 pt-6 w-[140px]" src="/AgentPro/images/logo.jpeg" alt="Logo" />
                 <h2 className="text-3xl sm:text-4xl font-semibold mb-2 text-center">Welcome</h2>
                 <p className="mb-4 text-center">Login to your account</p>
 

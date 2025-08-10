@@ -22,19 +22,19 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         {
           name: 'Calculate',
           id: 'calculate',
-          link: `/dashboard/${Orgcode}/calculate`,
+          link: `/AgentPro/dashboard/calculate`,
         },
         {
           name: 'Transaction',
           id: 'transaction',
-          link: `/dashboard/${Orgcode}/transaction`,
+          link: `/AgentPro/dashboard/transaction`,
         },
       ]
     : [
         {
           name: 'View Report',
           id: 'view-report',
-          link: `/dashboard/${Orgcode}/view-report`,
+          link: `/AgentPro/dashboard/view-report`,
         },
       ]
   )

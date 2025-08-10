@@ -9,7 +9,7 @@ const ProtectRoute = () => {
     return <Outlet />;
   }
 
-  return <Navigate to={`/${orgCode}`} replace />;
+  return <Navigate to={`/AgentPro/`} replace />;
 };
 
 export default ProtectRoute;

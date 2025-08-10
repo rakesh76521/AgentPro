@@ -138,7 +138,7 @@ const Transaction = () => {
 
     useEffect(() => {
         if (isUserEditing) return;
-        console.log('hereeeeeeeeeeeee3')
+        
         const result = (Number(seer) / 100) * Number(amount);
         setnetamount(result.toFixed(2));
     }, [seer, amount]);
@@ -1007,7 +1007,7 @@ const Transaction = () => {
                         <thead className="text-white uppercase bg-[#a9a9a9] text-center">
 
                             <tr>
-                                <th rowSpan="2" className="border p-2">S.no</th>
+                                <th rowSpan="2" className="border p-2">ID</th>
                                 <th rowSpan="2" className="border p-2">Client Name</th>
                                 <th rowSpan="2" className="border p-2">Amount</th>
                                 <th rowSpan="2" className="border p-2">Net Amount</th>
@@ -1035,17 +1035,15 @@ const Transaction = () => {
                                 <th className="border p-2 cursor-pointer" onClick={() => sortuser('comex')}>COMEX</th>
                             </tr>
 
-
-
                         </thead>
                         <tbody>
                             <tr className="">
-                                <td></td>
+                                <td className="p-4"></td>
                                 <td>
                                     <select
                                         value={clientname}
                                         id="name"
-                                        className="border px-4 my-4 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 h-10 w-[120px] rounded bg-white"
                                         onChange={(e) => setclientname(e.target.value)}
                                     >
                                         <option value="SANJU">SANJU</option>
@@ -1082,7 +1080,7 @@ const Transaction = () => {
                                         placeholder="Enter Amount"
                                         type="number"
                                         id="amount"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                     {amountmess && <p className="text-red-500 text-sm px-4 w-[200px]">{amountmess}</p>}
                                 </td>
@@ -1093,7 +1091,7 @@ const Transaction = () => {
                                         placeholder="Calculating net amount"
                                         type="number"
                                         id="netamount"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                     {netcomexmess && <p className="text-red-500 text-sm px-4 w-[200px]">{netcomexmess}</p>}
                                 </td>
@@ -1105,7 +1103,7 @@ const Transaction = () => {
                                         placeholder="Enter seer"
                                         disabled
                                         id="seer"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                     {seermess && <p className="text-red-500 text-sm px-4 w-[200px]">{seermess}</p>}
                                 </td>
@@ -1116,7 +1114,7 @@ const Transaction = () => {
                                         placeholder="Enter gross mcx"
                                         type="number"
                                         id="grossmcx"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                     {grossmcxmess && <p className="text-red-500 text-sm px-4 w-[200px]">{grossmcxmess}</p>}
                                 </td>
@@ -1127,7 +1125,7 @@ const Transaction = () => {
                                         placeholder="Enter gross nse"
                                         type="number"
                                         id="grossnse"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                     {grossnsemess && <p className="text-red-500 text-sm px-4 w-[200px]">{grossnsemess}</p>}
                                 </td>
@@ -1138,7 +1136,7 @@ const Transaction = () => {
                                         placeholder="Enter gross option"
                                         type="number"
                                         id="grossoptions"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                     {grossoptionmess && <p className="text-red-500 text-sm px-4 w-[200px]">{grossoptionmess}</p>}
                                 </td>
@@ -1149,7 +1147,7 @@ const Transaction = () => {
                                         placeholder="Enter gross comex"
                                         type="number"
                                         id="grosscomex"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                     {grosscomexmess && <p className="text-red-500 text-sm px-4 w-[200px]">{grosscomexmess}</p>}
                                 </td>
@@ -1161,7 +1159,7 @@ const Transaction = () => {
                                         type="number"
                                         id="grosstotal"
                                         placeholder="Calculating gross total"
-                                        className="border  px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border  px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
 
                                 </td>
@@ -1172,7 +1170,7 @@ const Transaction = () => {
                                         placeholder="Enter brokage mcx"
                                         type="number"
                                         id="brokagemcx"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                     {brokagemcxmess && <p className="text-red-500 text-sm px-4 w-[200px]">{brokagemcxmess}</p>}
                                 </td>
@@ -1183,7 +1181,7 @@ const Transaction = () => {
                                         placeholder="Enter brokage nse"
                                         type="number"
                                         id="brokagense"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                     {brokagensemess && <p className="text-red-500 text-sm px-4 w-[200px]">{brokagensemess}</p>}
                                 </td>
@@ -1194,7 +1192,7 @@ const Transaction = () => {
                                         placeholder="Enter brokage option"
                                         type="number"
                                         id="brokageoptions"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                     {brokageoptionmess && <p className="text-red-500 text-sm px-4 w-[200px]">{brokageoptionmess}</p>}
                                 </td>
@@ -1205,7 +1203,7 @@ const Transaction = () => {
                                         type="number"
                                         placeholder="Enter brokage comex"
                                         id="brokagecomex"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                     {brokagecomexmess && <p className="text-red-500 text-sm px-4 w-[200px]">{brokagecomexmess}</p>}
                                 </td>
@@ -1216,7 +1214,7 @@ const Transaction = () => {
                                         placeholder="Calculating net mcx"
                                         disabled
                                         id="netmcx"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                 </td>
                                 <td>
@@ -1226,7 +1224,7 @@ const Transaction = () => {
                                         type="number"
                                         placeholder="Calculating net nse"
                                         id="netnse"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                 </td>
                                 <td>
@@ -1236,7 +1234,7 @@ const Transaction = () => {
                                         type="number"
                                         placeholder="Calculating net option"
                                         id="netoptions"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                 </td>
                                 <td>
@@ -1246,7 +1244,7 @@ const Transaction = () => {
                                         disabled
                                         placeholder="Calculating net comex"
                                         id="netcomex"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                 </td>
                                 <td>
@@ -1256,7 +1254,7 @@ const Transaction = () => {
                                         type="number"
                                         id="comm"
                                         placeholder="Calculating Comm"
-                                        className="border px-4 my-4 mx-2 h-10 w-[200px] rounded bg-white"
+                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
                                     />
                                 </td>
                                 <td>

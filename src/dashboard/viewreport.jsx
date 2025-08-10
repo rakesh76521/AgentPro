@@ -74,7 +74,8 @@ const ViewReport = () => {
 
 
     function getnetamount(name, master, transaction) {
-        const result = (Number(master.commision) / 100) * Number(transaction[name].amount);
+        console.log(name,transaction)
+        const result = (Number(master.commision) / 100) * Number(transaction[name]?.amount);
         return result.toFixed(2);
     }
 
@@ -301,8 +302,8 @@ const ViewReport = () => {
             }
         }));
 
-        // console.log(reportmaster, reporttransaction, allnames)
-        for (var i = 0; i < reportmaster?.length; i++) {
+        console.log(reportmaster, reporttransaction, allnames)
+        for (var i = 0; i < (reportmaster?.length); i++) {
             const netamount = getnetamount(allnames[i], reportmaster[i], reporttransaction[i]);
             settotal((total + Number(getnetamount(allnames[i], reportmaster[i], reporttransaction[i]))).toFixed(2));
             const grosstotal = getgrosstotal(allnames[i], reportmaster[i], reporttransaction[i]);
