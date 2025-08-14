@@ -365,6 +365,7 @@ const Calculate = () => {
 
       existingData.push(newEntry);
       setclientname('VT');
+      setidval('');
       setagentname('UG50');
       setcommition('');
       setmcx('');
@@ -393,6 +394,7 @@ const Calculate = () => {
       setagentname('UG50');
       setcommition('');
       setmcx('');
+      setidval('');
       setnse('');
       setoption('');
       setcomex('');
