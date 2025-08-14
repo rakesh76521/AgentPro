@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+.input {
+    @apply focus:placeholder:translate-x-2 duration-500 transition-all hover:border-[#a29d99] focus:border-2 focus:border-[#696cff] focus:outline-none rounded-md p-2 mt-2 border-1 border-[#e0e0e0] w-full;
+
+}
+
+.custom-placeholder::placeholder {
+    font-size: 12px;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}

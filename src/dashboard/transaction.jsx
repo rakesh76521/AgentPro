@@ -9,17 +9,20 @@ const Transaction = () => {
     const loggeduser = useSelector((state) => state.loggeduser.user);
     const masterrecord = useSelector((state) => state.mastercommonrecord.mastercommonrec);
     const dispatch = useDispatch();
-    const Orgcode  = 'Org01'
+    const Orgcode = 'Org01'
     const [editinline, seteditinline] = useState(false);
     const iconRef = useRef(null);
+    const idvalRef = useRef(null);
 
     const [loading, setLoading] = useState(false);
     const [modalType, setModalType] = useState("");
+    const [checkeditadd, setcheckeditadd] = useState(true);
     const [clientname, setclientname] = useState("VT");
     const [amount, setamount] = useState("");
     const [seermess, setseermess] = useState('');
     const [clientnamefilter, setclientnamefilter] = useState("");
     const [edituserid, setedituserid] = useState(0);
+    const [idval, setidval] = useState('');
     const [netamount, setnetamount] = useState("");
     const [grossmcx, setgrossmcx] = useState("");
     const [grossnse, setgrossnse] = useState("");
@@ -48,6 +51,7 @@ const Transaction = () => {
     const [netamountmess, setnetamountmess] = useState('');
     const [nsemess, setnsemess] = useState('');
     const [grossmcxmess, setgrossmcxmess] = useState('');
+    const [idmess, setidmess] = useState('');
     const [grossnsemess, setgrossnsemess] = useState('');
     const [grossoptionmess, setgrossoptionmess] = useState('');
     const [grosscomexmess, setgrosscomexmess] = useState('');
@@ -108,6 +112,16 @@ const Transaction = () => {
     }, [modalType]);
 
     useEffect(() => {
+        if (anymessage?.error) {
+            const timer = setTimeout(() => {
+                setanymessage(null); // or setanymessage({})
+            }, 5000); // 5000ms = 5 seconds
+
+            return () => clearTimeout(timer); // Cleanup on unmount or change
+        }
+    }, [anymessage]);
+
+    useEffect(() => {
         if (!existingUsers) {
             setSortedUsers([]);
             return;
@@ -138,7 +152,7 @@ const Transaction = () => {
 
     useEffect(() => {
         if (isUserEditing) return;
-        
+
         const result = (Number(seer) / 100) * Number(amount);
         setnetamount(result.toFixed(2));
     }, [seer, amount]);
@@ -151,8 +165,6 @@ const Transaction = () => {
             Number(grossnse) +
             Number(grossoption) +
             Number(grosscomex);
-
-            console.log('hereeeeeee22222222')
 
         setgrosstotal(total.toFixed(2));
     }, [grossmcx, grossnse, grossoption, grosscomex]);
@@ -180,7 +192,6 @@ const Transaction = () => {
         setnetoption(netoptiontotal);
         setnetcomex(netcomextotal);
 
-        console.log('hereeeeeeeeeee')
         const total = ((Number(netmcxtotal) + Number(netnsetotal) + Number(netoptiontotal) + Number(netcomextotal)) * seer);
         setcomm((total / 100).toFixed(2));
 
@@ -259,7 +270,7 @@ const Transaction = () => {
             setModalType("edit");
             setedituserid(element);
             const edituserdata = existingUsers.find(data => data.id == element);
-            console.log(edituserdata)
+            setidval(edituserdata?.id)
             setclientname(edituserdata?.customerName);
             setamount(edituserdata?.amount);
             setseer(edituserdata?.seer);
@@ -279,10 +290,11 @@ const Transaction = () => {
             setbrokagecomex(edituserdata?.brokage?.comex);
             setcomm(edituserdata?.comm);
 
-            setTimeout(() => setIsUserEditing(false), 200); 
-        } 
+            setTimeout(() => setIsUserEditing(false), 200);
+        }
         else {
             setModalType("add");
+            setidval('');
             setclientname('VT');
             setamount('');
             setseer(seer);
@@ -340,94 +352,112 @@ const Transaction = () => {
     }
 
     function refresh(e) {
-
-        if (iconRef.current) {
-            iconRef.current.classList.add('spin');
-        }
-
         setLoading(true);
-        fetchalltransaction();
 
+        // Clear all fields
+        setidval('');
+        setclientname('VT');
+        setamount('');
+        setgrossmcx('');
+        setgrossnse('');
+        setgrossoption('');
+        setgrosscomex('');
+        setbrokagemcx('');
+        setbrokagense('');
+        setbrokageoption('');
+        setbrokagecomex('');
+        setcomm('');
+
+        setamountmess('');
+        setgrossmcxmess('');
+        setgrossnsemess('');
+        setgrossoptionmess('');
+        setgrosscomexmess('');
+        setbrokagemcxmess('');
+        setbrokagensemess('');
+        setbrokageoptionmess('');
+        setbrokagecomexmess('');
+
+        // Stop spinning once cleared (short delay to ensure state updates complete)
+        setTimeout(() => setLoading(false), 100); // <- Keep this short
     }
+
 
     function handleSubmit(e, inlinecheck) {
         e.preventDefault();
         let hasError = false;
-        if (inlinecheck !== 'update') {
-            if (!seer) {
-                setseermess('This field is required');
-                hasError = true;
-            } else {
-                setseermess('');
-            }
 
-            if (!amount) {
-                setamountmess('This field is required');
-                hasError = true;
-            } else {
-                setamountmess('');
-            }
-
-            if (!grossmcx) {
-                setgrossmcxmess('This field is required');
-                hasError = true;
-            } else {
-                setgrossmcxmess('');
-            }
-
-            if (!grossnse) {
-                setgrossnsemess('This field is required');
-                hasError = true;
-            } else {
-                setgrossnsemess('');
-            }
-
-            if (!grossoption) {
-                setgrossoptionmess('This field is required');
-                hasError = true;
-            } else {
-                setgrossoptionmess('');
-            }
-
-            if (!grosscomex) {
-                setgrosscomexmess('This field is required');
-                hasError = true;
-            } else {
-                setgrosscomexmess('');
-            }
-
-            if (!brokagemcx) {
-                setbrokagemcxmess('This field is required');
-                hasError = true;
-            } else {
-                setbrokagemcxmess('');
-            }
-
-            if (!brokagense) {
-                setbrokagensemess('This field is required');
-                hasError = true;
-            } else {
-                setbrokagensemess('');
-            }
-
-            if (!brokageoption) {
-                setbrokageoptionmess('This field is required');
-                hasError = true;
-            } else {
-                setbrokageoptionmess('');
-            }
-
-            if (!brokagecomex) {
-                setbrokagecomexmess('This field is required');
-                hasError = true;
-            } else {
-                setbrokagecomexmess('');
-            }
-
-            if (hasError) return false;
+        if (!idval) {
+            setidmess('This field is required');
+            hasError = true;
+        }
+        if (!amount) {
+            setamountmess('This field is required');
+            hasError = true;
+        } else {
+            setamountmess('');
         }
 
-        const action = e.target.value; // detect clicked button
+        if (!grossmcx) {
+            setgrossmcxmess('This field is required');
+            hasError = true;
+        } else {
+            setgrossmcxmess('');
+        }
+
+        if (!grossnse) {
+            setgrossnsemess('This field is required');
+            hasError = true;
+        } else {
+            setgrossnsemess('');
+        }
+
+        if (!grossoption) {
+            setgrossoptionmess('This field is required');
+            hasError = true;
+        } else {
+            setgrossoptionmess('');
+        }
+
+        if (!grosscomex) {
+            setgrosscomexmess('This field is required');
+            hasError = true;
+        } else {
+            setgrosscomexmess('');
+        }
+
+        if (!brokagemcx) {
+            setbrokagemcxmess('This field is required');
+            hasError = true;
+        } else {
+            setbrokagemcxmess('');
+        }
+
+        if (!brokagense) {
+            setbrokagensemess('This field is required');
+            hasError = true;
+        } else {
+            setbrokagensemess('');
+        }
+
+        if (!brokageoption) {
+            setbrokageoptionmess('This field is required');
+            hasError = true;
+        } else {
+            setbrokageoptionmess('');
+        }
+
+        if (!brokagecomex) {
+            setbrokagecomexmess('This field is required');
+            hasError = true;
+        } else {
+            setbrokagecomexmess('');
+        }
+
+        if (hasError) return false;
+
+
+        const action = checkeditadd; // detect clicked button
         const dateTime = new Date().toLocaleString('en-GB', {
             day: '2-digit',
             month: '2-digit',
@@ -447,14 +477,14 @@ const Transaction = () => {
             existingData = [];
         }
         // console.log(action)
-        if (action === 'submit' || inlinecheck === 'submit') {
+        if (action === true) {
             const nextId =
                 existingData.length > 0
                     ? Math.max(...existingData.map((entry) => entry.id || 0)) + 1
                     : 1;
 
             const newEntry = {
-                id: nextId,
+                id: idval,
                 customerName: clientname,
                 amount: amount || 0,
                 seer: seer || 0,
@@ -483,11 +513,12 @@ const Transaction = () => {
                 updatedDate: dateTime,
             };
             existingData.push(newEntry);
-        } else if (action === 'update') {
+        } else if (action === false) {
             existingData = existingData.map((item) => {
                 if (item.id === edituserid) {
                     return {
                         ...item,
+                        id:idval,
                         customerName: clientname,
                         amount: amount,
                         seer: seer,
@@ -521,22 +552,22 @@ const Transaction = () => {
         }
 
         localStorage.setItem(`transaction-${Orgcode}`, JSON.stringify(existingData));
-        if(action === 'submit') {
-            setclientname('VT');
-            setamount('');
-            setseer(seer);
-            setgrossmcx('');
-            setgrossnse('');
-            setgrossoption('');
-            setgrosscomex('');
-            setbrokagemcx('');
-            setbrokagense('');
-            setbrokageoption('');
-            setbrokagecomex('');
-            setcomm('');
-        }
-        setseermess('');
+
+        setclientname('VT');
+        setidval('');
+        setamount('');
+        setgrossmcx('');
+        setgrossnse('');
+        setgrossoption('');
+        setgrosscomex('');
+        setbrokagemcx('');
+        setbrokagense('');
+        setbrokageoption('');
+        setbrokagecomex('');
+        setcomm('');
+
         setamountmess('');
+        setidmess('');
         setgrossmcxmess('');
         setgrossnsemess('');
         setgrossoptionmess('');
@@ -548,7 +579,7 @@ const Transaction = () => {
         setexistingUsers(existingData);
         setSortedUsers(existingData);
         setallrecords(existingData.length);
-        setanymessage({ 'error': action + ' ' + 'successfully' });
+        setanymessage({ 'error': (action ? 'add' + ' ' + 'successfully' : 'update' + ' ' + 'successfully').toUpperCase() });
     }
 
     function deletetransaction(id) {
@@ -565,7 +596,7 @@ const Transaction = () => {
 
     return (
         <div>
-            <div className={`fixed inset-0 ${(modalType == 'add' || modalType == 'edit') ? 'visible' : 'hidden'}`}
+            {/* <div className={`fixed inset-0 ${(modalType == 'add' || modalType == 'edit') ? 'visible' : 'hidden'}`}
                 style={{
                     background: "rgba(0, 0, 0, 0.2)",
                     backdropFilter: "blur(8px)",
@@ -583,7 +614,7 @@ const Transaction = () => {
         animate-fadeIn
       "
                     >
-                        {/* Close Button */}
+                       
                         <button
                             onClick={() => {
                                 setModalType("");
@@ -598,7 +629,7 @@ const Transaction = () => {
                             />
                         </button>
 
-                        {/* Form */}
+                   
                         <form className="mt-6 space-y-4">
                             <div className="flex flex-col md:flex-row gap-6">
                                 <div className="flex flex-col w-full">
@@ -651,37 +682,6 @@ const Transaction = () => {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col md:flex-row gap-6">
-                                <div className="flex flex-col w-full">
-                                    <label htmlFor="sauda">SEER</label>
-                                    <div className="flex gap-5 items-center">
-                                        <input
-                                            value={seer}
-                                            onChange={(e) => setseer(e.target.value)}
-                                            type="number"
-                                            disabled
-                                            id="seer"
-                                            className="border p-2 rounded bg-white"
-                                        />
-                                        <span>%</span>
-                                    </div>
-                                    {seermess && <p className="text-red-500 text-sm">{seermess}</p>}
-                                </div>
-                            </div>
-                            <div className="flex flex-col md:flex-row gap-6">
-                                <div className="flex flex-col w-full">
-                                    <label htmlFor="quan">Net Amount</label>
-                                    <input
-                                        value={netamount}
-                                        disabled
-                                        type="number"
-                                        id="netamount"
-                                        className="border p-2 rounded bg-white"
-                                    />
-                                    {netamountmess && <p className="text-red-500 text-sm">{netamountmess}</p>}
-                                </div>
-                            </div>
-
                             <h1 className="font-bold">GROSS COMMISSION</h1>
                             <div className="flex flex-col md:flex-row gap-6">
                                 <div className="flex flex-col max-md:w-full w-[150px]">
@@ -729,19 +729,6 @@ const Transaction = () => {
                                         className="border p-2 rounded bg-white"
                                     />
                                     {grosscomexmess && <p className="text-red-500 text-sm">{grosscomexmess}</p>}
-                                </div>
-                            </div>
-                            <div className="flex flex-col md:flex-row gap-6">
-                                <div className="flex flex-col w-full">
-                                    <label htmlFor="grosstotal">GROSS TOTAL</label>
-                                    <input
-                                        value={grosstotal}
-                                        // onChange={(e) => setgrosstotal(e.target.value)}
-                                        disabled
-                                        type="number"
-                                        id="grosstotal"
-                                        className="border p-2 rounded bg-white"
-                                    />
                                 </div>
                             </div>
                             <h1 className="font-bold">BROKERAGE</h1>
@@ -793,70 +780,7 @@ const Transaction = () => {
                                     {brokagecomexmess && <p className="text-red-500 text-sm">{brokagecomexmess}</p>}
                                 </div>
                             </div>
-
-                            <h1 className="font-bold">NET COMMISSION</h1>
-                            <div className="flex flex-col md:flex-row gap-6">
-                                <div className="flex flex-col max-md:w-full w-[150px]">
-                                    <label htmlFor="netmcx">MCX</label>
-                                    <input
-                                        value={netmcx}
-                                        type="number"
-                                        disabled
-                                        id="netmcx"
-                                        className="border p-2 rounded bg-white"
-                                    />
-                                    {netmcxmess && <p className="text-red-500 text-sm">{netmcxmess}</p>}
-                                </div>
-                                <div className="flex flex-col max-md:w-full w-[150px]">
-                                    <label htmlFor="netnse">NSE</label>
-                                    <input
-                                        value={netnse}
-                                        disabled
-                                        type="number"
-                                        id="netnse"
-                                        className="border p-2 rounded bg-white"
-                                    />
-                                    {netnsemess && <p className="text-red-500 text-sm">{netnsemess}</p>}
-                                </div>
-
-
-                                <div className="flex flex-col max-md:w-full w-[150px]">
-                                    <label htmlFor="netoptions">Option</label>
-                                    <input
-                                        value={netoption}
-                                        disabled
-                                        type="number"
-                                        id="netoptions"
-                                        className="border p-2 rounded bg-white"
-                                    />
-                                    {netoptionmess && <p className="text-red-500 text-sm">{netoptionmess}</p>}
-                                </div>
-                                <div className="flex flex-col max-md:w-full w-[150px]">
-                                    <label htmlFor="netcomex">Comex</label>
-                                    <input
-                                        value={netcomex}
-                                        type="number"
-                                        disabled
-                                        id="netcomex"
-                                        className="border p-2 rounded bg-white"
-                                    />
-                                    {netcomexmess && <p className="text-red-500 text-sm">{netcomexmess}</p>}
-                                </div>
-                            </div>
-                            {console.log(comm,netcomex)}
-                            <div className="flex flex-col md:flex-row gap-6">
-                                <div className="flex flex-col w-full">
-                                    <label htmlFor="comm">COMM REV</label>
-                                    <input
-                                        value={comm}
-                                        disabled
-                                        type="number"
-                                        id="comm"
-                                        className="border p-2 rounded bg-white"
-                                    />
-                                </div>
-                            </div>
-                            {/* Footer with Close and Submit Buttons */}
+                            
                             <div className="border-t  border-gray-300 mt-6 pt-4 flex justify-end gap-4">
                                 <button
                                     onClick={() => {
@@ -885,7 +809,7 @@ const Transaction = () => {
                         </form>
                     </div>
                 </div>
-            )}
+            )} */}
             <details className="bg-white border border-gray-300 rounded-xl p-3 shadow-sm m-2">
                 <summary className="text-sm font-semibold text-gray-800 cursor-pointer select-none outline-none">
                     Apply Filter
@@ -940,414 +864,263 @@ const Transaction = () => {
 
             <div className="bg-gray-100 rounded-2xl py-2 px-4 overflow-auto">
                 {/* Search & Add User */}
-                <div className="flex gap-5 items-center mb-2 justify-between">
-                    <div className="flex justify-start">
+
+                {/* Fixed-height message container to avoid layout shift */}
+                <div className="min-h-[24px] mb-1 transition-opacity duration-300">
+                    {anymessage?.error && (
+                        <div className="text-green-600 font-semibold">
+                            {anymessage.error}
+                        </div>
+                    )}
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex gap-5 items-center mb-2 justify-end">
+                    <div className="flex gap-3 justify-end w-full">
+                        <div className="flex items-center cursor-pointer">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                ref={iconRef}
+                                viewBox="0 0 16 16"
+                                fill="currentColor"
+                                onClick={(e) => refresh(e)}
+                                className={`size-4 ${loading ? 'animate-spin' : ''}`}
+                            >
+                                <path d="M13.836 2.477a.75.75 0 0 1 .75.75v3.182a.75.75 0 0 1-.75.75h-3.182a.75.75 0 0 1 0-1.5h1.37l-.84-.841a4.5 4.5 0 0 0-7.08.932.75.75 0 0 1-1.3-.75 6 6 0 0 1 9.44-1.242l.842.84V3.227a.75.75 0 0 1 .75-.75Zm-.911 7.5A.75.75 0 0 1 13.199 11a6 6 0 0 1-9.44 1.241l-.84-.84v1.371a.75.75 0 0 1-1.5 0V9.591a.75.75 0 0 1 .75-.75H5.35a.75.75 0 0 1 0 1.5H3.98l.841.841a4.5 4.5 0 0 0 7.08-.932.75.75 0 0 1 1.025-.273Z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                {/* User Table */}
+                <div className="space-y-2">
+
+                    {/* 🔹 Table 1: Form Entry Table */}
+                    <div className="overflow-x-auto rounded-t-xl border shadow">
+                        <table className="min-w-[1200px] w-full text-sm text-center bg-white border border-gray-300">
+                            <thead className="text-white uppercase bg-[#a9a9a9]">
+                                <tr>
+                                    <th rowSpan="2" className="border p-2">ID</th>
+                                    <th rowSpan="2" className="border p-2">Client Name</th>
+                                    <th rowSpan="2" className="border p-2">Amount</th>
+                                    <th colSpan="4" className="border p-2">Gross</th>
+                                    <th colSpan="4" className="border p-2">Brokerage</th>
+                                    <th rowSpan="2" className="border p-2">Action</th>
+                                </tr>
+                                <tr>
+                                    {['MCX', 'NSE', 'OPTION', 'COMEX', 'MCX', 'NSE', 'OPTION', 'COMEX'].map((item, i) => (
+                                        <th key={i} className="border p-2 cursor-pointer" onClick={() => sortuser(item.toLowerCase())}>
+                                            {item}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div className="flex flex-col items-center gap-1">
+                                            <input
+                                                value={idval}
+                                                onChange={(e) => setidval(e.target.value)}
+                                                ref={idvalRef}
+                                                placeholder="Enter ID"
+                                                type="number"
+                                                id="id"
+                                                className="border p-2 rounded bg-white"
+                                            />
+                                            {idmess && <p className="text-red-500 text-sm">{idmess}</p>}
+
+                                        </div>
+                                    </td>
+                                    {/* Client Name Dropdown */}
+                                    <td className="border p-2">
+                                        <select
+                                            value={clientname}
+                                            onChange={(e) => setclientname(e.target.value)}
+                                            className="w-full max-w-[120px] h-10 rounded border bg-white px-2"
+                                        >
+                                            {[
+                                                "SANJU", "RAJA", "NAVIN", "KAMAL", "JIVAN", "HITRAT", "GURU",
+                                                "DARASINGH", "CHIRAG", "CHANDRA", "ANURAG", "ABHAY", "AADI",
+                                                "SANJAY", "RAJESH", "SHIVANI", "SH", "VT", "VIMLESH", "VIKAS",
+                                                "VD", "VARUN", "SUNIL", "SS", "SONY"
+                                            ].map(name => (
+                                                <option key={name} value={name}>{name}</option>
+                                            ))}
+                                        </select>
+                                    </td>
+
+                                    {/* Amount Input */}
+                                    <td className="border p-2">
+                                        <div className="flex flex-col items-center gap-1">
+                                            <input
+                                                value={amount}
+                                                onChange={(e) => setamount(e.target.value)}
+                                                placeholder="Enter Amount"
+                                                type="number"
+                                                className="w-full max-w-[100px] h-10 rounded border bg-white px-2"
+                                            />
+                                            {amountmess && <p className="text-xs text-red-500">{amountmess}</p>}
+                                        </div>
+                                    </td>
+
+                                    {/* Gross Inputs */}
+                                    {[grossmcx, grossnse, grossoption, grosscomex].map((val, idx) => (
+                                        <td key={idx} className="border p-2">
+                                            <div className="flex flex-col items-center gap-1">
+                                                <input
+                                                    value={val}
+                                                    onChange={(e) => {
+                                                        const setters = [setgrossmcx, setgrossnse, setgrossoption, setgrosscomex];
+                                                        setters[idx](e.target.value);
+                                                    }}
+                                                    placeholder={`Gross ${['MCX', 'NSE', 'Option', 'Comex'][idx]}`}
+                                                    type="number"
+                                                    className="w-full max-w-[100px] h-10 rounded border bg-white px-2"
+                                                />
+                                                {[
+                                                    grossmcxmess, grossnsemess, grossoptionmess, grosscomexmess
+                                                ][idx] && <p className="text-xs text-red-500">
+                                                        {[
+                                                            grossmcxmess, grossnsemess, grossoptionmess, grosscomexmess
+                                                        ][idx]}
+                                                    </p>}
+                                            </div>
+                                        </td>
+                                    ))}
+
+                                    {/* Brokerage Inputs */}
+                                    {[brokagemcx, brokagense, brokageoption, brokagecomex].map((val, idx) => (
+                                        <td key={idx} className="border p-2">
+                                            <div className="flex flex-col items-center gap-1">
+                                                <input
+                                                    value={val}
+                                                    onChange={(e) => {
+                                                        const setters = [setbrokagemcx, setbrokagense, setbrokageoption, setbrokagecomex];
+                                                        setters[idx](e.target.value);
+                                                    }}
+                                                    placeholder={`Brokerage ${['MCX', 'NSE', 'Option', 'Comex'][idx]}`}
+                                                    type="number"
+                                                    className="w-full max-w-[100px] h-10 rounded border bg-white px-2"
+                                                />
+                                                {[
+                                                    brokagemcxmess, brokagensemess, brokageoptionmess, brokagecomexmess
+                                                ][idx] && <p className="text-xs text-red-500">
+                                                        {[
+                                                            brokagemcxmess, brokagensemess, brokageoptionmess, brokagecomexmess
+                                                        ][idx]}
+                                                    </p>}
+                                            </div>
+                                        </td>
+                                    ))}
+
+                                    {/* Submit Button */}
+                                    <td className="border p-2">
+                                        <button
+                                            onClick={(e) => { handleSubmit(e, 'submit'); setcheckeditadd(true) }}
+                                            value={'submit'}
+                                            className="bg-gray-600 text-white px-3 py-2 rounded text-xs"
+                                        >
+                                            <div className="flex gap-1 items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-4 w-4">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                                </svg>
+                                            </div>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* 🔹 Table 2: Excel-Style Data Table */}
+                    <div className="flex justify-start mt-20">
                         <input
                             type="search"
                             value={searchvalue}
                             placeholder={`Search by ${loggeduser?.payload?.role === 'CLIENT' ? '' : 'customer,'} IPO , type...`}
                             onChange={(e) => search(e)}
-                            className="max-sm:w-[40vw] w-[30vw] px-4 py-2 border border-gray-600 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400 transition-all duration-200"
+                            className="max-sm:w-[40vw] w-[30vw] px-4 py-1 border border-gray-600 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400 transition-all duration-200"
                         />
                     </div>
-                    <div className="flex gap-3">
-                        <div className="flex justify-end gap-3">
-                            <div className="flex items-center cursor-pointer">
-                                <svg xmlns="http://www.w3.org/2000/svg" ref={iconRef} viewBox="0 0 16 16" fill="currentColor" onClick={(e) => refresh(e)} className="size-4">
-                                    <path d="M13.836 2.477a.75.75 0 0 1 .75.75v3.182a.75.75 0 0 1-.75.75h-3.182a.75.75 0 0 1 0-1.5h1.37l-.84-.841a4.5 4.5 0 0 0-7.08.932.75.75 0 0 1-1.3-.75 6 6 0 0 1 9.44-1.242l.842.84V3.227a.75.75 0 0 1 .75-.75Zm-.911 7.5A.75.75 0 0 1 13.199 11a6 6 0 0 1-9.44 1.241l-.84-.84v1.371a.75.75 0 0 1-1.5 0V9.591a.75.75 0 0 1 .75-.75H5.35a.75.75 0 0 1 0 1.5H3.98l.841.841a4.5 4.5 0 0 0 7.08-.932.75.75 0 0 1 1.025-.273Z" />
-                                </svg>
-                            </div>
-                            {/* <button
-                                className="cursor-pointer text-white font-semibold text-[10px] py-2 px-6 rounded-lg shadow-md transition duration-300"
-                                onClick={(e) => downloadexcel(e)}
-                                style={{ backgroundColor: '#198754' }}
-                            >
-                                <div className="flex gap-2">
-                                    <span className="max-md:hidden">
-                                        Export
-                                    </span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4 max-md:visible">
-                                        <path d="M8.75 2.75a.75.75 0 0 0-1.5 0v5.69L5.03 6.22a.75.75 0 0 0-1.06 1.06l3.5 3.5a.75.75 0 0 0 1.06 0l3.5-3.5a.75.75 0 0 0-1.06-1.06L8.75 8.44V2.75Z" />
-                                        <path d="M3.5 9.75a.75.75 0 0 0-1.5 0v1.5A2.75 2.75 0 0 0 4.75 14h6.5A2.75 2.75 0 0 0 14 11.25v-1.5a.75.75 0 0 0-1.5 0v1.5c0 .69-.56 1.25-1.25 1.25h-6.5c-.69 0-1.25-.56-1.25-1.25v-1.5Z" />
-                                    </svg>
-                                </div>
-                            </button> */}
+                    <div className="overflow-x-auto rounded-md border shadow">
+                        <table className="min-w-[1200px] w-full text-sm text-center bg-white border border-gray-400 table-fixed">
+                            <thead className="bg-[#d9e1f2]">
+                                <tr>
+                                    <th rowSpan="2" className="border p-2">ID</th>
+                                    <th rowSpan="2" className="border p-2">Client Name</th>
+                                    <th rowSpan="2" className="border p-2">Amount</th>
+                                    <th rowSpan="2" className="border p-2">Net Amount</th>
+                                    <th rowSpan="2" className="border p-2">Seer</th>
+                                    <th colSpan="5" className="border p-2">Gross</th>
+                                    <th colSpan="4" className="border p-2">Brokerage</th>
+                                    <th colSpan="4" className="border p-2">Net Commission</th>
+                                    <th className="border p-2">Comm</th>
+                                    <th rowSpan="2" colSpan="2" className="border p-2">Action</th>
+                                </tr>
+                                <tr>
+                                    {['MCX', 'NSE', 'OPTION', 'COMEX', 'TOTAL', 'MCX', 'NSE', 'OPTION', 'COMEX', 'MCX', 'NSE', 'OPTION', 'COMEX'].map((item, idx) => (
+                                        <th key={idx} className="border p-2 cursor-pointer" onClick={() => sortuser(item.toLowerCase())}>
+                                            {item}
+                                        </th>
+                                    ))}
+                                    <th className="border p-2 cursor-pointer" onClick={() => sortuser('comm')}>COMM</th>
+                                </tr>
+                            </thead>
 
-                        </div>
-                        {loggeduser?.payload?.role !== 'client' ?
-                            <div>
-                                <button
-                                    onClick={() => edituserform(null, modalType)}
-                                    className="cursor-pointer px-4 py-2 text-white rounded shadow transition duration-200 text-[12px]"
-                                    style={{ backgroundColor: '#0d6efd' }}
-                                >
-                                    <div className="flex gap-2 justify-center items-center">
-                                        <span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                            </svg>
-                                        </span>
-                                        <span className="max-sm:hidden">
-                                            Add Transaction
-                                        </span>
-                                    </div>
-                                </button>
-                            </div>
-
-                            :
-                            ''
-
-                        }
+                            <tbody>
+                                {sortedUsers?.length > 0 ? (
+                                    sortedUsers.slice(startindex, startindex + Number(records_per_Page)).map((element, index) => (
+                                        <tr key={index} className="hover:bg-gray-50">
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element.id}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.customerName}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.amount}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.netamount}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.seer}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.gross?.mcx}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.gross?.nse}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.gross?.option}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.gross?.comex}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.grosstotal}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.brokage?.mcx}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.brokage?.nse}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.brokage?.option}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.brokage?.comex}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.netcommision?.mcx}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.netcommision?.nse}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.netcommision?.option}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.netcommision?.comex}</div></td>
+                                            <td className="border p-2"><div className="max-w-[100px] overflow-x-auto whitespace-nowrap">{element?.comm}</div></td>
+                                            {loggeduser?.payload?.role !== 'client' && (
+                                                <td colSpan="2" className="border p-2">
+                                                    <div className="flex justify-center gap-2">
+                                                        <button
+                                                            onClick={() => { edituserform(element.id, 'edit'); setcheckeditadd(false) }}
+                                                            className="bg-gray-600 text-white px-3 py-2 rounded-md text-xs"
+                                                        >
+                                                            ✏️
+                                                        </button>
+                                                        <button
+                                                            onClick={() => deletetransaction(element.id)}
+                                                            className="bg-red-600 text-white px-3 py-2 rounded-md text-xs"
+                                                        >
+                                                            🗑️
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            )}
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="20" className="border p-6 text-center text-gray-500">No data found</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                {/* User Table */}
-                <div className="overflow-x-auto rounded-t-xl">
-                    <table className="w-full text-sm text-left bg-white rounded-t-xl shadow overflow-hidden border-2 border-b-gray-300">
-                        <thead className="text-white uppercase bg-[#a9a9a9] text-center">
-
-                            <tr>
-                                <th rowSpan="2" className="border p-2">ID</th>
-                                <th rowSpan="2" className="border p-2">Client Name</th>
-                                <th rowSpan="2" className="border p-2">Amount</th>
-                                <th rowSpan="2" className="border p-2">Net Amount</th>
-                                <th rowSpan="2" className="border p-2">Seer</th>
-                                <th colSpan="5" className="border p-2">Gross</th>
-                                <th colSpan="4" className="border p-2">Brokerage</th>
-                                <th colSpan="4" className="border p-2">Net Commision</th>
-                                <th rowSpan="2" className="border p-2">Comm Rev</th>
-                                <th rowSpan="2" className="border p-2 cursor-pointer">Action</th>
-
-                            </tr>
-                            <tr>
-                                <th className="border p-2 cursor-pointer" onClick={() => sortuser('mcx')}>MCX</th>
-                                <th className="border p-2 cursor-pointer" onClick={() => sortuser('nse')}>NSE</th>
-                                <th className="border p-2 cursor-pointer" onClick={() => sortuser('option')}>OPTION</th>
-                                <th className="border p-2 cursor-pointer" onClick={() => sortuser('comex')}>COMEX</th>
-                                <th className="border p-2 cursor-pointer" onClick={() => sortuser('total')}>TOTAL</th>
-                                <th className="border p-2 cursor-pointer" onClick={() => sortuser('mcx')}>MCX</th>
-                                <th className="border p-2 cursor-pointer" onClick={() => sortuser('nse')}>NSE</th>
-                                <th className="border p-2 cursor-pointer" onClick={() => sortuser('option')}>OPTION</th>
-                                <th className="border p-2 cursor-pointer" onClick={() => sortuser('comex')}>COMEX</th>
-                                <th className="border p-2 cursor-pointer" onClick={() => sortuser('mcx')}>MCX</th>
-                                <th className="border p-2 cursor-pointer" onClick={() => sortuser('nse')}>NSE</th>
-                                <th className="border p-2 cursor-pointer" onClick={() => sortuser('option')}>OPTION</th>
-                                <th className="border p-2 cursor-pointer" onClick={() => sortuser('comex')}>COMEX</th>
-                            </tr>
-
-                        </thead>
-                        <tbody>
-                            <tr className="">
-                                <td className="p-4"></td>
-                                <td>
-                                    <select
-                                        value={clientname}
-                                        id="name"
-                                        className="border px-4 my-4 h-10 w-[120px] rounded bg-white"
-                                        onChange={(e) => setclientname(e.target.value)}
-                                    >
-                                        <option value="SANJU">SANJU</option>
-                                        <option value="RAJA">RAJA</option>
-                                        <option value="NAVIN">NAVIN</option>
-                                        <option value="KAMAL">KAMAL</option>
-                                        <option value="JIVAN">JIVAN</option>
-                                        <option value="HITRAT">HITRAT</option>
-                                        <option value="GURU">GURU</option>
-                                        <option value="DARASINGH">DARASINGH</option>
-                                        <option value="CHIRAG">CHIRAG</option>
-                                        <option value="CHANDRA">CHANDRA</option>
-                                        <option value="ANURAG">ANURAG</option>
-                                        <option value="ABHAY">ABHAY</option>
-                                        <option value="AADI">AADI</option>
-                                        <option value="SANJAY">SANJAY</option>
-                                        <option value="RAJESH">RAJESH</option>
-                                        <option value="SHIVANI">SHIVANI</option>
-                                        <option value="SH">SH</option>
-                                        <option value="VT">VT</option>
-                                        <option value="VIMLESH">VIMLESH</option>
-                                        <option value="VIKAS">VIKAS</option>
-                                        <option value="VD">VD</option>
-                                        <option value="VARUN">VARUN</option>
-                                        <option value="SUNIL">SUNIL</option>
-                                        <option value="SS">SS</option>
-                                        <option value="SONY">SONY</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <input
-                                        value={amount}
-                                        onChange={(e) => setamount(e.target.value)}
-                                        placeholder="Enter Amount"
-                                        type="number"
-                                        id="amount"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                    {amountmess && <p className="text-red-500 text-sm px-4 w-[200px]">{amountmess}</p>}
-                                </td>
-                                <td>
-                                    <input
-                                        value={netamount}
-                                        disabled
-                                        placeholder="Calculating net amount"
-                                        type="number"
-                                        id="netamount"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                    {netcomexmess && <p className="text-red-500 text-sm px-4 w-[200px]">{netcomexmess}</p>}
-                                </td>
-                                <td>
-                                    <input
-                                        value={seer}
-                                        onChange={(e) => setseer(e.target.value)}
-                                        type="number"
-                                        placeholder="Enter seer"
-                                        disabled
-                                        id="seer"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                    {seermess && <p className="text-red-500 text-sm px-4 w-[200px]">{seermess}</p>}
-                                </td>
-                                <td>
-                                    <input
-                                        value={grossmcx}
-                                        onChange={(e) => setgrossmcx(e.target.value)}
-                                        placeholder="Enter gross mcx"
-                                        type="number"
-                                        id="grossmcx"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                    {grossmcxmess && <p className="text-red-500 text-sm px-4 w-[200px]">{grossmcxmess}</p>}
-                                </td>
-                                <td>
-                                    <input
-                                        value={grossnse}
-                                        onChange={(e) => setgrossnse(e.target.value)}
-                                        placeholder="Enter gross nse"
-                                        type="number"
-                                        id="grossnse"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                    {grossnsemess && <p className="text-red-500 text-sm px-4 w-[200px]">{grossnsemess}</p>}
-                                </td>
-                                <td>
-                                    <input
-                                        value={grossoption}
-                                        onChange={(e) => setgrossoption(e.target.value)}
-                                        placeholder="Enter gross option"
-                                        type="number"
-                                        id="grossoptions"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                    {grossoptionmess && <p className="text-red-500 text-sm px-4 w-[200px]">{grossoptionmess}</p>}
-                                </td>
-                                <td>
-                                    <input
-                                        value={grosscomex}
-                                        onChange={(e) => setgrosscomex(e.target.value)}
-                                        placeholder="Enter gross comex"
-                                        type="number"
-                                        id="grosscomex"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                    {grosscomexmess && <p className="text-red-500 text-sm px-4 w-[200px]">{grosscomexmess}</p>}
-                                </td>
-                                <td>
-                                    <input
-                                        value={grosstotal}
-                                        // onChange={(e) => setgrosstotal(e.target.value)}
-                                        disabled
-                                        type="number"
-                                        id="grosstotal"
-                                        placeholder="Calculating gross total"
-                                        className="border  px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-
-                                </td>
-                                <td>
-                                    <input
-                                        value={brokagemcx}
-                                        onChange={(e) => setbrokagemcx(e.target.value)}
-                                        placeholder="Enter brokage mcx"
-                                        type="number"
-                                        id="brokagemcx"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                    {brokagemcxmess && <p className="text-red-500 text-sm px-4 w-[200px]">{brokagemcxmess}</p>}
-                                </td>
-                                <td>
-                                    <input
-                                        value={brokagense}
-                                        onChange={(e) => setbrokagense(e.target.value)}
-                                        placeholder="Enter brokage nse"
-                                        type="number"
-                                        id="brokagense"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                    {brokagensemess && <p className="text-red-500 text-sm px-4 w-[200px]">{brokagensemess}</p>}
-                                </td>
-                                <td>
-                                    <input
-                                        value={brokageoption}
-                                        onChange={(e) => setbrokageoption(e.target.value)}
-                                        placeholder="Enter brokage option"
-                                        type="number"
-                                        id="brokageoptions"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                    {brokageoptionmess && <p className="text-red-500 text-sm px-4 w-[200px]">{brokageoptionmess}</p>}
-                                </td>
-                                <td>
-                                    <input
-                                        value={brokagecomex}
-                                        onChange={(e) => setbrokagecomex(e.target.value)}
-                                        type="number"
-                                        placeholder="Enter brokage comex"
-                                        id="brokagecomex"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                    {brokagecomexmess && <p className="text-red-500 text-sm px-4 w-[200px]">{brokagecomexmess}</p>}
-                                </td>
-                                <td>
-                                    <input
-                                        value={netmcx}
-                                        type="number"
-                                        placeholder="Calculating net mcx"
-                                        disabled
-                                        id="netmcx"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        value={netnse}
-                                        disabled
-                                        type="number"
-                                        placeholder="Calculating net nse"
-                                        id="netnse"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        value={netoption}
-                                        disabled
-                                        type="number"
-                                        placeholder="Calculating net option"
-                                        id="netoptions"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        value={netcomex}
-                                        type="number"
-                                        disabled
-                                        placeholder="Calculating net comex"
-                                        id="netcomex"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        value={comm}
-                                        disabled
-                                        type="number"
-                                        id="comm"
-                                        placeholder="Calculating Comm"
-                                        className="border px-4 my-4 mx-2 h-10 w-[100px] rounded bg-white"
-                                    />
-                                </td>
-                                <td>
-                                    <div className="flex justify-center gap-2">
-                                        <button
-                                            onClick={(e) => handleSubmit(e, 'submit')}
-                                            value={'submit'}
-                                            className="cursor-pointer px-3 py-2 text-white rounded-md text-xs"
-                                            style={{ backgroundColor: '#696969' }}
-                                        >
-                                            <div className="flex gap-2 justify-center items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-4">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                                                </svg>
-                                            </div>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            {sortedUsers && sortedUsers.length > 0 ? (
-                                sortedUsers
-                                    .slice(startindex, startindex + Number(records_per_Page))
-                                    .map((element, index) => {
-                                        return (
-
-                                            <tr
-                                                key={index}
-                                                className="hover:bg-gray-50 border-2 transition duration-150 border-b border-gray-100"
-                                            >
-                                                <td className="p-4">{element.id}</td>
-                                                <td className="p-4">{element?.customerName}</td>
-                                                <td className="p-4">{element?.amount}</td>
-                                                <td className="p-4">{element?.netamount}</td>
-                                                <td className="p-4">{element?.seer}</td>
-
-                                                <td className="p-4">{element?.gross?.mcx}</td>
-                                                <td className="p-4">{element?.gross?.nse}</td>
-                                                <td className="p-4">{element?.gross?.option}</td>
-                                                <td className="p-4">{element?.gross?.comex}</td>
-                                                <td className="p-4">{element?.grosstotal}</td>
-                                                <td className="p-4">{element?.brokage?.mcx}</td>
-                                                <td className="p-4">{element?.brokage?.nse}</td>
-                                                <td className="p-4">{element?.brokage?.option}</td>
-                                                <td className="p-4">{element?.brokage?.comex}</td>
-                                                <td className="p-4">{element?.netcommision?.mcx}</td>
-                                                <td className="p-4">{element?.netcommision?.nse}</td>
-                                                <td className="p-4">{element?.netcommision?.option}
-                                                </td>
-                                                <td className="p-4">{element?.netcommision?.comex}</td>
-                                                <td className="p-4">{element?.comm}</td>
-                                                {loggeduser?.payload?.role !== 'client' && (
-                                                    <td className="p-4 text-center">
-                                                        <div className="flex justify-center gap-2">
-                                                            <button
-                                                                onClick={() => edituserform(element.id, 'edit')}
-                                                                className="cursor-pointer px-3 py-2 text-white rounded-md text-xs"
-                                                                style={{ backgroundColor: '#696969' }}
-                                                            >
-                                                                <div className="flex gap-2 justify-center items-center">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-4">
-                                                                        <path d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                                                                    </svg>
-                                                                </div>
-                                                            </button>                                                            
-                                                            <button
-                                                                onClick={() => deletetransaction(element.id)}
-                                                                className="cursor-pointer px-3 py-1 bg-[#dc3545] text-white rounded-md text-xs"
-                                                            >
-                                                                <div className="flex gap-2 justify-center items-center">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-4">
-                                                                        <path d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                                    </svg>
-
-                                                                    {/* <span className="max-sm:hidden text-[14px]">Delete</span> */}
-                                                                </div>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                )}
-                                            </tr>
-
-                                        );
-                                    })
-                            ) : (
-                                <tr>
-                                    <td colSpan="20" className="text-center p-6 text-gray-500">
-                                        No data found
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
 
                 {/* 🔽 Pagination section outside table but styled to match */}
                 <div className="w-full bg-white rounded-b-xl shadow px-4 py-3 flex flex-wrap justify-end items-center gap-4">

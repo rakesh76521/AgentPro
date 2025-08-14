@@ -60,7 +60,7 @@ const Topbar = () => {
                     </div>
                 </div>
                 <div className="bg-white border border-gray-200 shadow-md rounded-full p-1">
-                    <img className="w-[30px] h-[30px] rounded-full object-cover" src="/AgentPro/images/logo.jpeg" alt="Logo" />
+                    <img className="w-[40px] h-[40px] rounded-full object-cover" src="/AgentPro/images/logo.jpg" alt="Logo" />
                 </div>
                 <div className="text-lg font-semibold text-white">Agent Pro</div>
             </div>

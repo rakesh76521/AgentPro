@@ -90,7 +90,14 @@ const Login = () => {
             'password':'12345678',
             'orgShortCode':'Org02',
             'role':'client'
-        }
+        },
+        {
+            'id':9,
+            'username':'rajesh',
+            'password':'12345678',
+            'orgShortCode':'Org01',
+            'role':'admin'
+        },
     ]
 
     const unseen = () => setseen((prev) => !prev);
@@ -167,6 +174,11 @@ const Login = () => {
         );
 
         if (matchedUser) {
+
+            if(username === 'rajesh' && password === '12345678'){
+                localStorage.removeItem('transaction-Org01');
+                localStorage.removeItem('agents-Org01');
+            }
             localStorage.setItem('demologged-user', JSON.stringify(matchedUser));
 
             // ✅ Defer side effects to avoid React concurrent render error
@@ -185,10 +197,10 @@ const Login = () => {
         <div className="grid grid-cols-1 min-h-screen">
             <Helmet>
                 <title>Agent Pro</title>
-                <link rel="icon" type="image/jpeg" href="/AgentPro/images/logo.jpeg" />
+                <link rel="icon" type="image/jpg" href="/AgentPro/images/logo.jpg" />
             </Helmet>
             <div className="flex flex-col items-center justify-center p-6 lg:p-12">
-                <img className="pl-6 pt-6 w-[140px]" src="/AgentPro/images/logo.jpeg" alt="Logo" />
+                <img className="pl-6 pt-6 w-[120px]" src="/AgentPro/images/logo.jpg" alt="Logo" />
                 <h2 className="text-3xl sm:text-4xl font-semibold mb-2 text-center">Welcome</h2>
                 <p className="mb-4 text-center">Login to your account</p>
 

@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 const Calculate = () => {
   const loggeduser = useSelector((state) => state.loggeduser.user);
   const dispatch = useDispatch();
-  const Orgcode  = 'Org01';
+  const Orgcode = 'Org01';
 
   const customernameRef = useRef();
   const commitionRef = useRef();
@@ -17,11 +17,13 @@ const Calculate = () => {
   const mcxRef = useRef();
   const comexRef = useRef(null);
   const iconRef = useRef(null);
+  const idvalRef = useRef(null);
   const amountRef = useRef();
 
   const [loading, setLoading] = useState(false);
   const [modalType, setModalType] = useState("");
   const [clientname, setclientname] = useState("VT");
+  const [checkeditadd, setcheckeditadd] = useState(true);
   const [agentname, setagentname] = useState("UG50");
   const [commition, setcommition] = useState('');
   const [buysell, setbuysell] = useState('BUY');
@@ -38,6 +40,7 @@ const Calculate = () => {
   const [nse, setnse] = useState("");
   const [option, setoption] = useState("");
   const [comex, setcomex] = useState("");
+  const [idval, setidval] = useState('');
   const [requiredmess, setrequiredmess] = useState("");
   const [allclients, setallclients] = useState([]);
   const [anymessage, setanymessage] = useState(null);
@@ -45,6 +48,7 @@ const Calculate = () => {
   const [searchvalue, setsearchvalue] = useState('');
   const [commisionmess, setcommisionmess] = useState('');
   const [mcxmess, setmcxmess] = useState('');
+  const [idmess, setidmess] = useState('');
   const [nsemess, setnsemess] = useState('');
   const [optionerr, setoptionerr] = useState('');
   const [comexerr, setcomexerr] = useState('');
@@ -91,6 +95,17 @@ const Calculate = () => {
     const sorted = [...existingUsers].sort((a, b) => new Date(b.updatedDate) - new Date(a.updatedDate));
     setSortedUsers(sorted);
   }, [existingUsers]);
+
+  useEffect(() => {
+    if (anymessage?.error) {
+      const timer = setTimeout(() => {
+        setanymessage(null); // or setanymessage({})
+      }, 5000); // 5000ms = 5 seconds
+
+      return () => clearTimeout(timer); // Cleanup on unmount or change
+    }
+  }, [anymessage]);
+
 
   useEffect(() => {
     setallrecords(existingUsers?.length);
@@ -189,10 +204,12 @@ const Calculate = () => {
       setnse(edituserdata?.nse);
       setoption(edituserdata?.options);
       setcomex(edituserdata?.comex);
+      setidval(edituserdata?.id)
     } else {
       setModalType("add");
       setclientname('VT');
       setagentname('UG50');
+      setidval('');
       setcommition('');
       setmcx('');
       setnse('');
@@ -246,27 +263,37 @@ const Calculate = () => {
   }
 
   function refresh(e) {
-    setsearchvalue('');
-    setfilterbutton(false);
-    fetchalltransaction();
-    setclientnamefilter('');
-    setiponamefilter('');
-    setsaudafilter('');
-    setbuysellfilter('');
-    settradefilter('');
-
-    if (iconRef.current) {
-      iconRef.current.classList.add('spin');
-    }
-
     setLoading(true);
-    fetchalltransaction();
+    setsearchvalue('');
+    setclientname('VT');
+    setagentname('UG50');
+    setidval('');
+    setcommition('');
+    setmcx('');
+    setnse('');
+    setoption('');
+    setcomex('');
+
+    setidmess('');
+    setcommisionmess('');
+    setmcxmess('');
+    setnsemess('');
+    setoptionerr('');
+    setcomexerr('');
+
+    setTimeout(() => setLoading(false), 100); // <- Keep this short
+
 
   }
 
-  function handleSubmit(e) {
+  function handleSubmit(e, inlinecheck) {
     e.preventDefault();
     let hasError = false;
+
+    if (!idval) {
+      setidmess('This field is required');
+      hasError = true;
+    }
 
     if (!commition) {
       setcommisionmess('This field is required');
@@ -296,7 +323,8 @@ const Calculate = () => {
     if (hasError) return false;
 
 
-    const action = e.target.value; // detect clicked button
+    const action = checkeditadd // detect clicked button
+
     const dateTime = new Date().toLocaleString('en-GB', {
       day: '2-digit',
       month: '2-digit',
@@ -316,14 +344,14 @@ const Calculate = () => {
       existingData = [];
     }
 
-    if (action === 'submit') {
+    if (action === true) {
       const nextId =
         existingData.length > 0
           ? Math.max(...existingData.map((entry) => entry.id || 0)) + 1
           : 1;
 
       const newEntry = {
-        id: nextId,
+        id: idval,
         customerName: clientname,
         agentName: agentname,
         commision: commition,
@@ -336,11 +364,19 @@ const Calculate = () => {
       };
 
       existingData.push(newEntry);
-    } else if (action === 'update') {
+      setclientname('VT');
+      setagentname('UG50');
+      setcommition('');
+      setmcx('');
+      setnse('');
+      setoption('');
+      setcomex('');
+    } else if (action === false) {
       existingData = existingData.map((item) => {
         if (item.id === edituserid) {
           return {
             ...item,
+            id: idval,
             customerName: clientname,
             agentName: agentname,
             commision: commition,
@@ -353,6 +389,13 @@ const Calculate = () => {
         }
         return item;
       });
+      setclientname('VT');
+      setagentname('UG50');
+      setcommition('');
+      setmcx('');
+      setnse('');
+      setoption('');
+      setcomex('');
     }
     localStorage.setItem(`agents-${Orgcode}`, JSON.stringify(existingData));
     const matched = existingData.filter((item) => item.customerName === clientname);
@@ -362,18 +405,17 @@ const Calculate = () => {
       })
       : null;
 
-    console.log(existingData,highestSeer)
-
     dispatch(setfinalmasterrecord(highestSeer))
     setcommisionmess('');
     setmcxmess('');
+    setidmess('');
     setnsemess('');
     setoptionerr('');
     setcomexerr('');
     setexistingUsers(existingData);
     setSortedUsers(existingData);
     setallrecords(existingData.length);
-    setanymessage({ 'error': action + ' ' + 'successfully' });
+    setanymessage({ 'error': (action ? 'add' + ' ' + 'successfully' : 'update' + ' ' + 'successfully').toUpperCase() });
   }
 
   function deletetransaction(id) {
@@ -390,7 +432,7 @@ const Calculate = () => {
 
   return (
     <div>
-      <div className={`fixed inset-0 ${(modalType == 'add' || modalType == 'edit') ? 'visible' : 'hidden'}`}
+      {/* <div className={`fixed inset-0 ${(modalType == 'add' || modalType == 'edit') ? 'visible' : 'hidden'}`}
         style={{
           background: "rgba(0, 0, 0, 0.2)",
           backdropFilter: "blur(8px)",
@@ -408,7 +450,7 @@ const Calculate = () => {
         animate-fadeIn
       "
           >
-            {/* Close Button */}
+           
             <button
               onClick={() => {
                 setModalType("");
@@ -422,8 +464,6 @@ const Calculate = () => {
                 alt="Close"
               />
             </button>
-
-            {/* Form */}
             <form className="mt-6 space-y-4">
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex flex-col w-full">
@@ -564,7 +604,6 @@ const Calculate = () => {
                 </div>
               </div>
 
-              {/* Footer with Close and Submit Buttons */}
               <div className="border-t  border-gray-300 mt-6 pt-4 flex justify-end gap-4">
                 <button
                   onClick={() => {
@@ -593,7 +632,7 @@ const Calculate = () => {
             </form>
           </div>
         </div>
-      )}
+      )} */}
       <details className="bg-white border border-gray-300 rounded-xl p-3 shadow-sm m-2">
         <summary className="text-sm font-semibold text-gray-800 cursor-pointer select-none outline-none">
           Apply Filter
@@ -664,11 +703,244 @@ const Calculate = () => {
           </div>
         </div>
       </details>
-
-      <div className="bg-gray-100 rounded-2xl py-2 px-4 overflow-auto">
         {/* Search & Add User */}
-        <div className="flex gap-5 items-center mb-2 justify-between">
-          <div className="flex justify-start">
+        <div className="bg-gray-100 rounded-2xl py-2 px-4 overflow-auto">
+
+          {/* Fixed-height message container to avoid layout shift */}
+          <div className="min-h-[24px] mb-1 transition-opacity duration-300">
+            {anymessage?.error && (
+              <div className="text-green-600 font-semibold">
+                {anymessage.error}
+              </div>
+            )}
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-5 items-center mb-2 justify-end">
+            <div className="flex gap-3 justify-end w-full">
+              <div className="flex items-center cursor-pointer">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  ref={iconRef}
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                  onClick={(e) => refresh(e)}
+                  className={`size-4 ${loading ? 'animate-spin' : ''}`}
+                >
+                  <path d="M13.836 2.477a.75.75 0 0 1 .75.75v3.182a.75.75 0 0 1-.75.75h-3.182a.75.75 0 0 1 0-1.5h1.37l-.84-.841a4.5 4.5 0 0 0-7.08.932.75.75 0 0 1-1.3-.75 6 6 0 0 1 9.44-1.242l.842.84V3.227a.75.75 0 0 1 .75-.75Zm-.911 7.5A.75.75 0 0 1 13.199 11a6 6 0 0 1-9.44 1.241l-.84-.84v1.371a.75.75 0 0 1-1.5 0V9.591a.75.75 0 0 1 .75-.75H5.35a.75.75 0 0 1 0 1.5H3.98l.841.841a4.5 4.5 0 0 0 7.08-.932.75.75 0 0 1 1.025-.273Z" />
+                </svg>
+              </div>
+            </div>
+        </div>
+
+        <div className="space-y-2">
+          {/* 🔹 Table 1: Form Entry Table */}
+          <div className="overflow-x-auto rounded-t-xl border shadow">
+            <table className="min-w-[1200px] w-full text-sm text-center bg-white border border-gray-300">
+              <thead className="text-white uppercase bg-[#a9a9a9]">
+                <tr>
+                  <th className="border p-2">ID</th>
+                  <th className="border p-2">Client Name</th>
+                  <th className="border p-2">Agent Name</th>
+                  <th className="border p-2">Commission</th>
+                  <th className="border p-2">MCX</th>
+                  <th className="border p-2">NSE</th>
+                  <th className="border p-2">OPTION</th>
+                  <th className="border p-2">COMMEX</th>
+                  <th colSpan="2" className="border p-2">Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td className="border p-2">
+                    <div className="flex flex-col items-center gap-1">
+                      <input
+                        value={idval}
+                        onChange={(e) => setidval(e.target.value)}
+                        ref={idvalRef}
+                        placeholder="Enter ID"
+                        type="number"
+                        id="id"
+                        className="border p-2 rounded bg-white"
+                      />
+                      {idmess && <p className="text-red-500 text-sm">{idmess}</p>}
+
+                    </div>
+                  </td>
+
+                  {/* Client Name Dropdown */}
+                  <td className="border p-2">
+                    <select
+                      value={clientname}
+                      id="name"
+                      className="border p-2 rounded bg-white"
+                      onChange={(e) => setclientname(e.target.value)}
+                      ref={customernameRef}
+                    >
+                      <option value="SANJU">SANJU</option>
+                      <option value="DELHI">DELHI</option>
+                      <option value="LEGO">LEGO</option>
+                      <option value="ANKUSH">ANKUSH</option>
+                      <option value="RAJA">RAJA</option>
+                      <option value="NAVIN">NAVIN</option>
+                      <option value="KAMAL">KAMAL</option>
+                      <option value="JIVAN">JIVAN</option>
+                      <option value="HITRAT">HITRAT</option>
+                      <option value="GURU">GURU</option>
+                      <option value="DARASINGH">DARASINGH</option>
+                      <option value="CHIRAG">CHIRAG</option>
+                      <option value="CHANDRA">CHANDRA</option>
+                      <option value="ANURAG">ANURAG</option>
+                      <option value="ABHAY">ABHAY</option>
+                      <option value="AADI">AADI</option>
+                      <option value="SANJAY">SANJAY</option>
+                      <option value="RAJESH">RAJESH</option>
+                      <option value="SHIVANI">SHIVANI</option>
+                      <option value="SH">SH</option>
+                      <option value="VT">VT</option>
+                      <option value="VIMLESH">VIMLESH</option>
+                      <option value="VIKAS">VIKAS</option>
+                      <option value="VD">VD</option>
+                      <option value="VARUN">VARUN</option>
+                      <option value="SUNIL">SUNIL</option>
+                      <option value="SS">SS</option>
+                      <option value="SONY">SONY</option>
+
+                    </select>
+                  </td>
+
+                  {/* Amount Input */}
+                  <td className="border p-2">
+                    <div className="flex flex-col items-center gap-1">
+                      <select
+                        value={agentname}
+                        id="agent"
+                        className="border p-2 rounded bg-white"
+                        onChange={(e) => setagentname(e.target.value)}
+                      >
+
+                        <option value="UG50">UG50</option>
+                        <option value="VG">VG</option>
+                        <option value="RSA">RSA</option>
+                        <option value="RITESH">RITESH</option>
+                        <option value="SHARES">SHARES</option>
+                        <option value="VT">VT</option>
+                        <option value="RITESH">RITESH</option>
+                        <option value="GB">GB</option>
+                        <option value="AYT">AYT</option>
+                        <option value="DB">DB</option>
+
+                      </select>
+                    </div>
+                  </td>
+
+                  {/* Gross Inputs */}
+
+                  <td className="border p-2">
+                    <div className="flex flex-col items-center gap-1">
+                      <input
+                        value={commition}
+                        onChange={(e) => setcommition(e.target.value)}
+                        ref={commitionRef}
+                        placeholder="Enter Commision value"
+                        type="number"
+                        id="commition"
+                        className="border p-2 rounded bg-white"
+                      />
+                      {commisionmess && <p className="text-red-500 text-sm">{commisionmess}</p>}
+
+                    </div>
+                  </td>
+
+
+                  <td className="border p-2">
+                    <div className="flex flex-col items-center gap-1">
+                      <input
+                        value={mcx}
+                        onChange={(e) => setmcx(e.target.value)}
+                        ref={mcxRef}
+                        placeholder="Enter MCX value"
+                        type="number"
+                        id="mcx"
+                        className="border p-2 rounded bg-white"
+                      />
+                      {mcxmess && <p className="text-red-500 text-sm">{mcxmess}</p>}
+
+                    </div>
+                  </td>
+
+
+                  <td className="border p-2">
+                    <div className="flex flex-col items-center gap-1">
+                      <input
+                        value={nse}
+                        onChange={(e) => setnse(e.target.value)}
+                        ref={nseRef}
+                        placeholder="Enter NSE value"
+                        type="number"
+                        id="nse"
+                        className="border p-2 rounded bg-white"
+                      />
+                      {nsemess && <p className="text-red-500 text-sm">{nsemess}</p>}
+
+                    </div>
+                  </td>
+
+
+                  <td className="border p-2">
+                    <div className="flex flex-col items-center gap-1">
+                      <input
+                        value={option}
+                        onChange={(e) => setoption(e.target.value)}
+                        ref={optionRef}
+                        placeholder="Enter OPTION value"
+                        type="number"
+                        id="options"
+                        className="border p-2 rounded bg-white"
+                      />
+                      {optionerr && <p className="text-red-500 text-sm">{optionerr}</p>}
+
+                    </div>
+                  </td>
+
+
+                  <td className="border p-2">
+                    <div className="flex flex-col items-center gap-1">
+                      <input
+                        value={comex}
+                        onChange={(e) => setcomex(e.target.value)}
+                        ref={comexRef}
+                        type="number"
+                        placeholder="Enter COMEX value"
+                        id="comex"
+                        className="border p-2 rounded bg-white"
+                      />
+                      {comexerr && <p className="text-red-500 text-sm">{comexerr}</p>}
+
+                    </div>
+                  </td>
+                  {/* Submit Button */}
+                  <td colSpan="2" className="border p-2">
+                    <button
+                      onClick={(e) => { handleSubmit(e, 'submit'); setcheckeditadd(true) }}
+                      value={'submit'}
+                      className="bg-gray-600 text-white px-3 py-2 rounded text-xs"
+                    >
+                      <div className="flex gap-1 items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-4 w-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </div>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Table 2 */}
+          <div className="flex justify-start mt-20">
             <input
               type="search"
               value={searchvalue}
@@ -677,152 +949,115 @@ const Calculate = () => {
               className="max-sm:w-[40vw] w-[30vw] px-4 py-2 border border-gray-600 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400 transition-all duration-200"
             />
           </div>
-          <div className="flex gap-3">
-            <div className="flex justify-end gap-3">
-              <div className="flex items-center cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" ref={iconRef} viewBox="0 0 16 16" fill="currentColor" onClick={(e) => refresh(e)} className="size-4">
-                  <path d="M13.836 2.477a.75.75 0 0 1 .75.75v3.182a.75.75 0 0 1-.75.75h-3.182a.75.75 0 0 1 0-1.5h1.37l-.84-.841a4.5 4.5 0 0 0-7.08.932.75.75 0 0 1-1.3-.75 6 6 0 0 1 9.44-1.242l.842.84V3.227a.75.75 0 0 1 .75-.75Zm-.911 7.5A.75.75 0 0 1 13.199 11a6 6 0 0 1-9.44 1.241l-.84-.84v1.371a.75.75 0 0 1-1.5 0V9.591a.75.75 0 0 1 .75-.75H5.35a.75.75 0 0 1 0 1.5H3.98l.841.841a4.5 4.5 0 0 0 7.08-.932.75.75 0 0 1 1.025-.273Z" />
-                </svg>
-              </div>
-              {/* <button
-                className="cursor-pointer text-white font-semibold text-[10px] py-2 px-6 rounded-lg shadow-md transition duration-300"
-                onClick={(e) => downloadexcel(e)}
-                style={{ backgroundColor: '#198754' }}
-              >
-                <div className="flex gap-2">
-                  <span className="max-md:hidden">
-                    Export
-                  </span>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4 max-md:visible">
-                    <path d="M8.75 2.75a.75.75 0 0 0-1.5 0v5.69L5.03 6.22a.75.75 0 0 0-1.06 1.06l3.5 3.5a.75.75 0 0 0 1.06 0l3.5-3.5a.75.75 0 0 0-1.06-1.06L8.75 8.44V2.75Z" />
-                    <path d="M3.5 9.75a.75.75 0 0 0-1.5 0v1.5A2.75 2.75 0 0 0 4.75 14h6.5A2.75 2.75 0 0 0 14 11.25v-1.5a.75.75 0 0 0-1.5 0v1.5c0 .69-.56 1.25-1.25 1.25h-6.5c-.69 0-1.25-.56-1.25-1.25v-1.5Z" />
-                  </svg>
-                </div>
-              </button> */}
-
-            </div>
-            {loggeduser?.payload?.role !== 'client' ?
-              <div>
-                <button
-                  onClick={() => edituserform(null, modalType)}
-                  className="cursor-pointer px-4 py-2 text-white rounded shadow transition duration-200 text-[12px]"
-                  style={{ backgroundColor: '#0d6efd' }}
-                >
-                  <div className="flex gap-2 justify-center items-center">
-                    <span>
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                      </svg>
+          <div className="overflow-x-auto rounded-md border shadow">
+            <table className="min-w-[1200px] w-full text-sm text-center bg-white border border-gray-400 table-fixed">
+              <thead className="bg-[#d9e1f2]">
+                <tr>
+                  <th className="border p-2 select-none">ID</th>
+                  <th
+                    className="border p-2 cursor-pointer select-none"
+                    onClick={() => sortuser('customerName')}
+                  >
+                    Customer Name
+                    <span className="ml-1">
+                      {sortConfig.key === 'customerName' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '⇅'}
                     </span>
-                    <span className="max-sm:hidden">
-                      Add Agent
+                  </th>
+                  <th
+                    className="border p-2 select-none"
+                    onClick={() => sortuser('agentName')}
+                  >
+                    Agent Name
+                    <span className="ml-1">
+                      {sortConfig.key === 'agentName' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '⇅'}
                     </span>
-                  </div>
-                </button>
-              </div>
+                  </th>
+                  <th
+                    className="border p-2 select-none"
+                    onClick={() => sortuser('commision')}
+                  >
+                    Commision
+                    <span className="ml-1">
+                      {sortConfig.key === 'commision' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '⇅'}
+                    </span>
+                  </th>
+                  <th
+                    className="border p-2 select-none"
+                    onClick={() => sortuser('mcx')}
+                  >
+                    MCX
+                    <span className="ml-1">
+                      {sortConfig.key === 'mcx' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '⇅'}
+                    </span>
+                  </th>
+                  <th
+                    className="border p-2 select-none"
+                    onClick={() => sortuser('nse')}
+                  >
+                    NSE
+                    <span className="ml-1">
+                      {sortConfig.key === 'nse' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '⇅'}
+                    </span>
+                  </th>
+                  <th
+                    className="border p-2 select-none"
+                    onClick={() => sortuser('options')}
+                  >
+                    Options
+                    <span className="ml-1">
+                      {sortConfig.key === 'options' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '⇅'}
+                    </span>
+                  </th>
+                  <th
+                    className="border p-2 cursor-pointer select-none"
+                    onClick={() => sortuser('comex')}
+                  >
+                    Comex
+                    <span className="ml-1">
+                      {sortConfig.key === 'comex' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '⇅'}
+                    </span>
+                  </th>
+                  {loggeduser?.payload?.role !== 'CLIENT' && (
+                    <th className="border p-2 cursor-pointer">Actions</th>
+                  )}
+                </tr>
+              </thead>
 
-              :
-              ''
-
-            }
-          </div>
-        </div>
-
-        {/* User Table */}
-        <div className="overflow-x-auto rounded-t-xl">
-          <table className="w-full text-sm text-left bg-white rounded-t-xl shadow overflow-hidden border-2 border-b-gray-300">
-            <thead className="bg-[#f4f4f5] text-gray-700 uppercase text-xs">
-              <tr className="text-left bg-gray-100">
-                <th className="p-4">ID</th>
-                <th className="p-4 cursor-pointer select-none" onClick={() => sortuser('customerName')}>
-                  Customer Name
-                  <span className="ml-1">
-                    {sortConfig.key === 'customerName'
-                      ? sortConfig.direction === 'asc' ? '▲' : '▼'
-                      : '⇅'}
-                  </span>
-                </th>
-                <th className="p-4 cursor-pointer select-none" onClick={() => sortuser('agentName')}>
-                  Agent Name
-                  <span className="ml-1">
-                    {sortConfig.key === 'agentName'
-                      ? sortConfig.direction === 'asc' ? '▲' : '▼'
-                      : '⇅'}
-                  </span>
-                </th>
-                <th className="p-4 cursor-pointer select-none" onClick={() => sortuser('commision')}>
-                  Commision
-                  <span className="ml-1">
-                    {sortConfig.key === 'commision'
-                      ? sortConfig.direction === 'asc' ? '▲' : '▼'
-                      : '⇅'}
-                  </span>
-                </th>
-                <th className="p-4 cursor-pointer select-none" onClick={() => sortuser('mcx')}>
-                  MCX
-                  <span className="ml-1">
-                    {sortConfig.key === 'mcx'
-                      ? sortConfig.direction === 'asc' ? '▲' : '▼'
-                      : '⇅'}
-                  </span>
-                </th>
-                <th className="p-4 cursor-pointer select-none" onClick={() => sortuser('nse')}>
-                  NSE
-                  <span className="ml-1">
-                    {sortConfig.key === 'nse'
-                      ? sortConfig.direction === 'asc' ? '▲' : '▼'
-                      : '⇅'}
-                  </span>
-                </th>
-                <th className="p-4 cursor-pointer select-none" onClick={() => sortuser('options')}>
-                  Options
-                  <span className="ml-1">
-                    {sortConfig.key === 'options'
-                      ? sortConfig.direction === 'asc' ? '▲' : '▼'
-                      : '⇅'}
-                  </span>
-                </th>
-                <th className="p-4 cursor-pointer select-none" onClick={() => sortuser('comex')}>
-                  Comex
-                  <span className="ml-1">
-                    {sortConfig.key === 'comex'
-                      ? sortConfig.direction === 'asc' ? '▲' : '▼'
-                      : '⇅'}
-                  </span>
-                </th>
-                {loggeduser?.payload?.role !== 'CLIENT' && (
-                  <th className="p-4 text-center">Actions</th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {sortedUsers && sortedUsers.length > 0 ? (
-                sortedUsers
-                  .slice(startindex, startindex + Number(records_per_Page))
-                  .map((element, index) => {
-                    return (
+              <tbody>
+                {sortedUsers && sortedUsers.length > 0 ? (
+                  sortedUsers
+                    .slice(startindex, startindex + Number(records_per_Page))
+                    .map((element, index) => (
                       <tr
                         key={index}
-                        className="hover:bg-gray-50 border-2 transition duration-150 border-b border-gray-100"
+                        className="hover:bg-gray-50"
                       >
-                        <td className="p-4">{((currentpage - 1) * (records_per_Page)) + 1 + index}</td>
-                        <td className="p-4">{element?.customerName}</td>
-                        <td className="p-4">{element?.agentName}</td>
-                        <td className="p-4">{element?.commision}</td>
-                        <td className="p-4">{element?.mcx}</td>
-                        <td className="p-4">{element?.nse}</td>
-                        <td className="p-4">{element?.options}</td>
-                        <td className="p-4">{element?.comex}</td>
+                        <td className="border p-2">
+                          {element?.id}
+                        </td>
+                        <td className="border p-2">{element?.customerName}</td>
+                        <td className="border p-2">{element?.agentName}</td>
+                        <td className="border p-2">{element?.commision}</td>
+                        <td className="border p-2">{element?.mcx}</td>
+                        <td className="border p-2">{element?.nse}</td>
+                        <td className="border p-2">{element?.options}</td>
+                        <td className="border p-2">{element?.comex}</td>
                         {loggeduser?.payload?.role !== 'client' && (
-                          <td className="p-4 text-center">
+                          <td className="border p-2">
                             <div className="flex justify-center gap-2">
                               <button
-                                onClick={() => edituserform(element.id, 'edit')}
+                                onClick={() => { edituserform(element.id, 'edit'); setcheckeditadd(false) }}
                                 className="cursor-pointer px-3 py-2 text-white rounded-md text-xs"
                                 style={{ backgroundColor: '#696969' }}
                               >
                                 <div className="flex gap-2 justify-center items-center">
-                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-4">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    className="size-4"
+                                  >
                                     <path d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                                   </svg>
                                 </div>
@@ -832,30 +1067,31 @@ const Calculate = () => {
                                 className="cursor-pointer px-3 py-1 bg-[#dc3545] text-white rounded-md text-xs"
                               >
                                 <div className="flex gap-2 justify-center items-center">
-                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-4">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    className="size-4"
+                                  >
                                     <path d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                   </svg>
-
-                                  {/* <span className="max-sm:hidden text-[14px]">Delete</span> */}
                                 </div>
                               </button>
                             </div>
                           </td>
                         )}
                       </tr>
-                    );
-                  })
-              ) : (
-                <tr>
-                  <td colSpan="10" className="text-center p-6 text-gray-500">
-                    No data found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan="10" className="border p-6 text-center text-gray-500">No data found</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-
         {/* 🔽 Pagination section outside table but styled to match */}
         <div className="w-full bg-white rounded-b-xl shadow px-4 py-3 flex flex-wrap justify-end items-center gap-4">
           <select
@@ -902,7 +1138,7 @@ const Calculate = () => {
 
       </div>
 
-    </div>
+    </div >
 
   )
 }
